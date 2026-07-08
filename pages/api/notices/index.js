@@ -10,14 +10,23 @@ export default async function handler(req, res) {
     try {
 
       const notices = await prisma.notice.findMany({
+
         orderBy: [
+
+          {
+            pinned: "desc",
+          },
+
           {
             priority: "desc",
           },
+
           {
             publishDate: "desc",
           },
+
         ],
+
       });
 
       return res.status(200).json(notices);
@@ -50,23 +59,24 @@ export default async function handler(req, res) {
         image,
       } = req.body;
 
-      // --------------------------
-      // Validation
-      // --------------------------
-
       if (!title?.trim() || !body?.trim()) {
+
         return res.status(400).json({
           error: "Title and Body are required.",
         });
+
       }
 
       if (!publishDate || isNaN(Date.parse(publishDate))) {
+
         return res.status(400).json({
           error: "Invalid publish date.",
         });
+
       }
 
       const notice = await prisma.notice.create({
+
         data: {
           title,
           body,
@@ -74,7 +84,9 @@ export default async function handler(req, res) {
           priority,
           publishDate: new Date(publishDate),
           image,
+          pinned: false,
         },
+
       });
 
       return res.status(201).json(notice);

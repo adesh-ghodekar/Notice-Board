@@ -15,19 +15,22 @@ export default function Home() {
 
   const noticesPerPage = 5;
 
-  useEffect(() => {
-    async function fetchNotices() {
-      try {
-        const res = await fetch("/api/notices");
-        const data = await res.json();
-        setNotices(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    }
+  async function fetchNotices() {
+    try {
+      setLoading(true);
 
+      const res = await fetch("/api/notices");
+      const data = await res.json();
+
+      setNotices(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
     fetchNotices();
   }, []);
 
@@ -54,6 +57,10 @@ export default function Home() {
     } else {
       toast.error("Failed to delete notice.");
     }
+  }
+
+  async function handlePin() {
+    await fetchNotices();
   }
 
   const filteredNotices = useMemo(() => {
@@ -213,6 +220,7 @@ export default function Home() {
                 key={notice.id}
                 notice={notice}
                 handleDelete={handleDelete}
+                handlePin={handlePin}
               />
             ))}
           </div>

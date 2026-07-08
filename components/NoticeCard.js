@@ -1,20 +1,53 @@
 import Link from "next/link";
+import { toast } from "react-toastify";
 
-export default function NoticeCard({ notice, handleDelete }) {
+export default function NoticeCard({
+  notice,
+  handleDelete,
+  handlePin,
+}) {
+  async function togglePin() {
+    const res = await fetch(`/api/notices/${notice.id}/pin`, {
+      method: "PATCH",
+    });
+
+    if (res.ok) {
+      handlePin();
+
+      toast.success(
+        notice.pinned
+          ? "Notice unpinned successfully!"
+          : "Notice pinned successfully!"
+      );
+    } else {
+      toast.error("Failed to update pin status.");
+    }
+  }
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-md transition hover:shadow-xl">
 
       <div className="flex items-center justify-between">
 
-        <span
-          className={`rounded-full px-4 py-1 text-sm font-bold text-white ${
-            notice.priority === "URGENT"
-              ? "bg-red-500"
-              : "bg-green-500"
-          }`}
-        >
-          {notice.priority}
-        </span>
+        <div className="flex items-center gap-3">
+
+          <span
+            className={`rounded-full px-4 py-1 text-sm font-bold text-white ${
+              notice.priority === "URGENT"
+                ? "bg-red-500"
+                : "bg-green-500"
+            }`}
+          >
+            {notice.priority}
+          </span>
+
+          {notice.pinned && (
+            <span className="rounded-full bg-yellow-400 px-3 py-1 text-sm font-bold text-black">
+              📌 Pinned
+            </span>
+          )}
+
+        </div>
 
         <span className="text-sm text-gray-500">
           {new Date(notice.publishDate).toLocaleDateString()}
@@ -39,7 +72,18 @@ export default function NoticeCard({ notice, handleDelete }) {
         </span>
       </div>
 
-      <div className="mt-6 flex gap-4">
+      <div className="mt-6 flex flex-wrap gap-4">
+
+        <button
+          onClick={togglePin}
+          className={`rounded-lg px-5 py-2 font-medium text-white transition ${
+            notice.pinned
+              ? "bg-yellow-600 hover:bg-yellow-700"
+              : "bg-yellow-500 hover:bg-yellow-600"
+          }`}
+        >
+          {notice.pinned ? "📍 Unpin" : "📌 Pin"}
+        </button>
 
         <Link
           href={`/notices/edit/${notice.id}`}
