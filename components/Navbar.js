@@ -2,32 +2,31 @@ import Link from "next/link";
 
 export default function Navbar() {
   return (
-    <nav
-      style={{
-        backgroundColor: "#1e40af",
-        color: "white",
-        padding: "16px 32px",
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-      }}
-    >
-      <h2>📢 College Notice Board</h2>
+    <nav className="bg-blue-800 text-white shadow-md">
+      <div className="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
 
-      <div style={{ display: "flex", gap: "20px" }}>
-        <Link
-          href="/"
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          Home
-        </Link>
+        <h1 className="text-2xl font-bold">
+          📢 College Notice Board
+        </h1>
 
-        <Link
-          href="/notices/create"
-          style={{ color: "white", textDecoration: "none" }}
-        >
-          Create Notice
-        </Link>
+        <div className="flex gap-8 text-lg">
+
+          <Link
+            href="/"
+            className="hover:text-blue-200 transition"
+          >
+            Home
+          </Link>
+
+          <Link
+            href="/notices/create"
+            className="hover:text-blue-200 transition"
+          >
+            Create Notice
+          </Link>
+
+        </div>
+
       </div>
     </nav>
   );

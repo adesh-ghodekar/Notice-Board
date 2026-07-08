@@ -24,7 +24,7 @@ export default function EditNotice() {
         setCategory(data.category);
         setPriority(data.priority);
         setPublishDate(
-          new Date(data.publishDate).toISOString().split("T")[0]
+            data.publishDate ? data.publishDate.split("T")[0] : ""
         );
         setImage(data.image || "");
       });

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import NoticeCard from "../components/NoticeCard";
 
 export default function Home() {
+
   const [notices, setNotices] = useState([]);
 
   useEffect(() => {
@@ -10,117 +11,74 @@ export default function Home() {
       .then((data) => setNotices(data));
   }, []);
 
+  async function handleDelete(id) {
+
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this notice?"
+    );
+
+    if (!confirmDelete) return;
+
+    const res = await fetch(`/api/notices/${id}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+
+      setNotices((prev) =>
+        prev.filter((notice) => notice.id !== id)
+      );
+
+    } else {
+
+      alert("Failed to delete notice.");
+
+    }
+
+  }
+
   return (
-    <div style={{ maxWidth: "1000px", margin: "40px auto", padding: "20px" }}>
-      <h1>College Notice Board</h1>
+    <div className="max-w-5xl mx-auto px-6 py-10">
 
-      <p>Welcome to the College Notice Board System.</p>
+      <h1 className="text-4xl font-bold">
+        College Notice Board
+      </h1>
 
-      <hr style={{ margin: "30px 0" }} />
+      <p className="mt-3 text-gray-600">
+        Welcome to the College Notice Board System.
+      </p>
 
-      <h2>Latest Notices</h2>
+      <hr className="my-8" />
+
+      <h2 className="text-2xl font-semibold">
+        Latest Notices
+      </h2>
 
       {notices.length === 0 ? (
-        <p>No notices available.</p>
+
+        <p className="mt-6">
+          No notices available.
+        </p>
+
       ) : (
-        notices.map((notice) => (
-          <div
-            key={notice.id}
-            style={{
-              border: "1px solid #ddd",
-              borderRadius: "10px",
-              padding: "25px",
-              marginTop: "20px",
-              backgroundColor: "#fff",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            }}
-          >
-            {/* Header */}
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "15px",
-              }}
-            >
-              <span
-                style={{
-                  backgroundColor:
-                    notice.priority === "URGENT"
-                      ? "#dc3545"
-                      : "#28a745",
-                  color: "white",
-                  padding: "6px 12px",
-                  borderRadius: "20px",
-                  fontSize: "14px",
-                  fontWeight: "bold",
-                }}
-              >
-                {notice.priority}
-              </span>
 
-              <span style={{ color: "#666" }}>
-                {new Date(notice.publishDate).toLocaleDateString()}
-              </span>
-            </div>
+        <div className="space-y-8 mt-8">
 
-            {/* Title */}
-            <h2 style={{ marginBottom: "10px" }}>{notice.title}</h2>
+          {notices.map((notice) => (
 
-            {/* Body */}
-            <p
-              style={{
-                color: "#555",
-                lineHeight: "1.6",
-                marginBottom: "20px",
-              }}
-            >
-              {notice.body}
-            </p>
+            <NoticeCard
+              key={notice.id}
+              notice={notice}
+              handleDelete={handleDelete}
+            />
 
-            {/* Category */}
-            <p>
-              <strong>Category:</strong> {notice.category}
-            </p>
+          ))}
 
-            {/* Buttons */}
-            <div
-              style={{
-                marginTop: "20px",
-                display: "flex",
-                gap: "15px",
-              }}
-            >
-              <Link
-                href={`/notices/edit/${notice.id}`}
-                style={{
-                  backgroundColor: "#0d6efd",
-                  color: "white",
-                  padding: "10px 18px",
-                  borderRadius: "6px",
-                  textDecoration: "none",
-                }}
-              >
-                Edit
-              </Link>
+        </div>
 
-              <button
-                style={{
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 18px",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))
       )}
+
     </div>
   );
+
 }
