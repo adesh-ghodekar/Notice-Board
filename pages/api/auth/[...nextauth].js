@@ -9,16 +9,16 @@ export const authOptions = {
       name: "Credentials",
 
       credentials: {
-        username: {
-          label: "Username",
-          type: "text",
+        login: {
+            label: "Email or Username",
+            type: "text",
         },
 
         password: {
-          label: "Password",
-          type: "password",
+            label: "Password",
+            type: "password",
         },
-      },
+        },
 
       async authorize(credentials) {
         if (!credentials?.login || !credentials?.password) {

@@ -7,11 +7,16 @@ export default function Navbar() {
   return (
     <nav className="bg-blue-800 shadow-md">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <h1 className="text-2xl font-bold text-white">
+
+        <Link
+          href="/"
+          className="text-2xl font-bold text-white"
+        >
           📢 College Notice Board
-        </h1>
+        </Link>
 
         <div className="flex items-center gap-6">
+
           <Link
             href="/"
             className="font-medium text-white transition hover:text-blue-200"
@@ -22,10 +27,10 @@ export default function Navbar() {
           {session ? (
             <>
               <Link
-                href="/notices/create"
+                href="/admin"
                 className="font-medium text-white transition hover:text-blue-200"
               >
-                Create Notice
+                Dashboard
               </Link>
 
               <button
@@ -43,7 +48,9 @@ export default function Navbar() {
               Login
             </Link>
           )}
+
         </div>
+
       </div>
     </nav>
   );
