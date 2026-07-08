@@ -1,10 +1,12 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import NoticeForm from "../../../components/NoticeForm";
 
 export default function EditNotice() {
   const router = useRouter();
   const { id } = router.query;
+  const { data: session, status } = useSession();
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -14,6 +16,13 @@ export default function EditNotice() {
   const [image, setImage] = useState("");
 
   useEffect(() => {
+    if (status === "loading") return;
+
+    if (!session) {
+      router.replace("/login");
+      return;
+    }
+
     if (!id) return;
 
     fetch(`/api/notices/${id}`)
@@ -28,7 +37,7 @@ export default function EditNotice() {
         );
         setImage(data.image || "");
       });
-  }, [id]);
+  }, [id, session, status, router]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -54,6 +63,18 @@ export default function EditNotice() {
     } else {
       alert("Update Failed.");
     }
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="flex h-[70vh] items-center justify-center text-xl font-semibold">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (

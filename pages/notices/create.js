@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 import NoticeForm from "../../components/NoticeForm";
 
 export default function CreateNotice() {
   const router = useRouter();
+  const { data: session, status } = useSession();
 
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -11,6 +13,14 @@ export default function CreateNotice() {
   const [priority, setPriority] = useState("NORMAL");
   const [publishDate, setPublishDate] = useState("");
   const [image, setImage] = useState("");
+
+  useEffect(() => {
+    if (status === "loading") return;
+
+    if (!session) {
+      router.replace("/login");
+    }
+  }, [session, status, router]);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -36,6 +46,18 @@ export default function CreateNotice() {
     } else {
       alert("Something went wrong.");
     }
+  }
+
+  if (status === "loading") {
+    return (
+      <div className="flex h-[70vh] items-center justify-center text-xl font-semibold">
+        Loading...
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
   }
 
   return (
