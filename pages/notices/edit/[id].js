@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import NoticeForm from "../../../components/NoticeForm";
+import { toast } from "react-toastify";
 
 export default function EditNotice() {
   const router = useRouter();
@@ -58,10 +59,10 @@ export default function EditNotice() {
     });
 
     if (res.ok) {
-      alert("Notice Updated Successfully!");
+      toast.success("Notice Updated Successfully!");
       router.push("/");
     } else {
-      alert("Update Failed.");
+      toast.error("Failed to update notice.");
     }
   }
 

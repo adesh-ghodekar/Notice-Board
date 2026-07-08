@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { useEffect, useMemo, useState } from "react";
 import NoticeCard from "../components/NoticeCard";
 import StatsCards from "../components/StatsCards";
@@ -49,8 +50,9 @@ export default function Home() {
       setNotices((prev) =>
         prev.filter((notice) => notice.id !== id)
       );
+      toast.success("Notice Deleted Successfully!");
     } else {
-      alert("Failed to delete notice.");
+      toast.error("Failed to delete notice.");
     }
   }
 

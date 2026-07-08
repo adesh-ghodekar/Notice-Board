@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import NoticeForm from "../../components/NoticeForm";
+import { toast } from "react-toastify";
 
 export default function CreateNotice() {
   const router = useRouter();
@@ -41,10 +42,10 @@ export default function CreateNotice() {
     });
 
     if (res.ok) {
-      alert("Notice Created Successfully!");
+      toast.success("Notice Created Successfully!");
       router.push("/");
     } else {
-      alert("Something went wrong.");
+      toast.error("Failed to create notice.");
     }
   }
 
