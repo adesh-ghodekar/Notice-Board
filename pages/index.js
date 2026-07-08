@@ -6,12 +6,19 @@ export default function Home() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("ALL");
   const [priorityFilter, setPriorityFilter] = useState("ALL");
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const noticesPerPage = 5;
 
   useEffect(() => {
     fetch("/api/notices")
       .then((res) => res.json())
       .then((data) => setNotices(data));
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, categoryFilter, priorityFilter]);
 
   async function handleDelete(id) {
     const confirmDelete = window.confirm(
@@ -50,6 +57,18 @@ export default function Home() {
       return matchSearch && matchCategory && matchPriority;
     });
   }, [notices, search, categoryFilter, priorityFilter]);
+
+  const totalPages = Math.ceil(
+    filteredNotices.length / noticesPerPage
+  );
+
+  const indexOfLastNotice = currentPage * noticesPerPage;
+  const indexOfFirstNotice = indexOfLastNotice - noticesPerPage;
+
+  const currentNotices = filteredNotices.slice(
+    indexOfFirstNotice,
+    indexOfLastNotice
+  );
 
   return (
     <div className="mx-auto max-w-6xl px-6 py-10">
@@ -105,15 +124,59 @@ export default function Home() {
           No matching notices found.
         </p>
       ) : (
-        <div className="mt-8 space-y-8">
-          {filteredNotices.map((notice) => (
-            <NoticeCard
-              key={notice.id}
-              notice={notice}
-              handleDelete={handleDelete}
-            />
-          ))}
-        </div>
+        <>
+          <div className="mt-8 space-y-8">
+            {currentNotices.map((notice) => (
+              <NoticeCard
+                key={notice.id}
+                notice={notice}
+                handleDelete={handleDelete}
+              />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-10 flex items-center justify-center gap-2">
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => prev - 1)
+                }
+                disabled={currentPage === 1}
+                className="rounded-lg bg-gray-200 px-4 py-2 disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() =>
+                    setCurrentPage(index + 1)
+                  }
+                  className={`rounded-lg px-4 py-2 ${
+                    currentPage === index + 1
+                      ? "bg-blue-700 text-white"
+                      : "bg-gray-200"
+                  }`}
+                >
+                  {index + 1}
+                </button>
+              ))}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => prev + 1)
+                }
+                disabled={currentPage === totalPages}
+                className="rounded-lg bg-gray-200 px-4 py-2 disabled:opacity-50"
+              >
+                Next
+              </button>
+
+            </div>
+          )}
+        </>
       )}
     </div>
   );
