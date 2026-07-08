@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import NoticeForm from "../../components/NoticeForm";
-import { toast } from "react-toastify";
 
 export default function CreateNotice() {
   const router = useRouter();
@@ -42,24 +41,22 @@ export default function CreateNotice() {
     });
 
     if (res.ok) {
-      toast.success("Notice Created Successfully!");
+      alert("Notice Created Successfully!");
       router.push("/");
     } else {
-      toast.error("Failed to create notice.");
+      alert("Something went wrong.");
     }
   }
 
   if (status === "loading") {
     return (
-      <div className="flex h-[70vh] items-center justify-center text-xl font-semibold">
-        Loading...
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-14 w-14 animate-spin rounded-full border-4 border-blue-700 border-t-transparent"></div>
       </div>
     );
   }
 
-  if (!session) {
-    return null;
-  }
+  if (!session) return null;
 
   return (
     <div className="mx-auto mt-10 max-w-2xl rounded-xl bg-white p-8 shadow-lg">

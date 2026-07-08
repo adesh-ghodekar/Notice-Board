@@ -1,9 +1,23 @@
 import { prisma } from "../../../../lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../../auth/[...nextauth]";
 
 export default async function handler(req, res) {
   if (req.method !== "PATCH") {
     return res.status(405).json({
       error: "Method Not Allowed",
+    });
+  }
+
+  // ==========================
+  // AUTH CHECK
+  // ==========================
+
+  const session = await getServerSession(req, res, authOptions);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Unauthorized",
     });
   }
 
@@ -38,6 +52,7 @@ export default async function handler(req, res) {
     });
 
     return res.status(200).json(updatedNotice);
+
   } catch (error) {
     console.error(error);
 

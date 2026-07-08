@@ -6,13 +6,13 @@ export default function Login() {
   const router = useRouter();
   const { data: session } = useSession();
 
-  const [username, setUsername] = useState("");
+  const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   useEffect(() => {
     if (session) {
-      router.replace("/");
+      router.replace("/admin");
     }
   }, [session, router]);
 
@@ -22,36 +22,39 @@ export default function Login() {
     setError("");
 
     const result = await signIn("credentials", {
-      username,
+      login,
       password,
       redirect: false,
     });
 
     if (result?.error) {
-      setError("Invalid username or password.");
+      setError("Invalid email/username or password.");
       return;
     }
 
-    router.push("/");
+    router.push("/admin");
   }
 
   return (
     <div className="flex min-h-[80vh] items-center justify-center bg-gray-100">
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
+
         <h1 className="mb-8 text-center text-3xl font-bold text-gray-800">
           Admin Login
         </h1>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+
           <div>
             <label className="mb-2 block font-medium">
-              Username
+              Email or Username
             </label>
 
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+              placeholder="admin@college.com or admin"
               className="w-full rounded-lg border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
@@ -83,15 +86,19 @@ export default function Login() {
           >
             Login
           </button>
+
         </form>
 
         <div className="mt-6 rounded-lg bg-gray-100 p-4 text-sm text-gray-600">
-          <p>
-            <strong>Demo Credentials</strong>
+          <p className="font-semibold mb-2">
+            Demo Credentials
           </p>
+
+          <p>Email: admin@college.com</p>
           <p>Username: admin</p>
           <p>Password: admin123</p>
         </div>
+
       </div>
     </div>
   );

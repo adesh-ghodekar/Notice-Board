@@ -1,7 +1,8 @@
 import { prisma } from "../../../lib/prisma";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "../auth/[...nextauth]";
 
 export default async function handler(req, res) {
-
   const id = Number(req.query.id);
 
   if (isNaN(id)) {
@@ -11,13 +12,11 @@ export default async function handler(req, res) {
   }
 
   // ==========================
-  // GET SINGLE NOTICE
+  // GET SINGLE NOTICE (PUBLIC)
   // ==========================
 
   if (req.method === "GET") {
-
     try {
-
       const notice = await prisma.notice.findUnique({
         where: {
           id,
@@ -31,17 +30,25 @@ export default async function handler(req, res) {
       }
 
       return res.status(200).json(notice);
-
     } catch (error) {
-
       console.error(error);
 
       return res.status(500).json({
         error: "Failed to fetch notice",
       });
-
     }
+  }
 
+  // ==========================
+  // AUTH CHECK
+  // ==========================
+
+  const session = await getServerSession(req, res, authOptions);
+
+  if (!session) {
+    return res.status(401).json({
+      error: "Unauthorized",
+    });
   }
 
   // ==========================
@@ -49,9 +56,7 @@ export default async function handler(req, res) {
   // ==========================
 
   if (req.method === "PUT") {
-
     try {
-
       const {
         title,
         body,
@@ -68,7 +73,6 @@ export default async function handler(req, res) {
       }
 
       const updatedNotice = await prisma.notice.update({
-
         where: {
           id,
         },
@@ -81,21 +85,16 @@ export default async function handler(req, res) {
           publishDate: new Date(publishDate),
           image,
         },
-
       });
 
       return res.status(200).json(updatedNotice);
-
     } catch (error) {
-
       console.error(error);
 
       return res.status(500).json({
         error: "Failed to update notice.",
       });
-
     }
-
   }
 
   // ==========================
@@ -103,9 +102,7 @@ export default async function handler(req, res) {
   // ==========================
 
   if (req.method === "DELETE") {
-
     try {
-
       await prisma.notice.delete({
         where: {
           id,
@@ -115,21 +112,16 @@ export default async function handler(req, res) {
       return res.status(200).json({
         message: "Notice deleted successfully.",
       });
-
     } catch (error) {
-
       console.error(error);
 
       return res.status(500).json({
         error: error.message,
       });
-
     }
-
   }
 
   return res.status(405).json({
     error: "Method Not Allowed",
   });
-
 }

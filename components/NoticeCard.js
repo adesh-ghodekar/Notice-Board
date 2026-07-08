@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { toast } from "react-toastify";
+import { useSession } from "next-auth/react";
 
 export default function NoticeCard({
   notice,
   handleDelete,
   handlePin,
 }) {
+  const { data: session } = useSession();
+
   async function togglePin() {
     const res = await fetch(`/api/notices/${notice.id}/pin`, {
       method: "PATCH",
@@ -72,34 +75,37 @@ export default function NoticeCard({
         </span>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-4">
+      {/* Admin Actions */}
+      {session && (
+        <div className="mt-6 flex flex-wrap gap-4">
 
-        <button
-          onClick={togglePin}
-          className={`rounded-lg px-5 py-2 font-medium text-white transition ${
-            notice.pinned
-              ? "bg-yellow-600 hover:bg-yellow-700"
-              : "bg-yellow-500 hover:bg-yellow-600"
-          }`}
-        >
-          {notice.pinned ? "📍 Unpin" : "📌 Pin"}
-        </button>
+          <button
+            onClick={togglePin}
+            className={`rounded-lg px-5 py-2 font-medium text-white transition ${
+              notice.pinned
+                ? "bg-yellow-600 hover:bg-yellow-700"
+                : "bg-yellow-500 hover:bg-yellow-600"
+            }`}
+          >
+            {notice.pinned ? "📍 Unpin" : "📌 Pin"}
+          </button>
 
-        <Link
-          href={`/notices/edit/${notice.id}`}
-          className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-700"
-        >
-          ✏️ Edit
-        </Link>
+          <Link
+            href={`/notices/edit/${notice.id}`}
+            className="rounded-lg bg-blue-600 px-5 py-2 font-medium text-white transition hover:bg-blue-700"
+          >
+            ✏️ Edit
+          </Link>
 
-        <button
-          onClick={() => handleDelete(notice.id)}
-          className="rounded-lg bg-red-500 px-5 py-2 font-medium text-white transition hover:bg-red-600"
-        >
-          🗑 Delete
-        </button>
+          <button
+            onClick={() => handleDelete(notice.id)}
+            className="rounded-lg bg-red-500 px-5 py-2 font-medium text-white transition hover:bg-red-600"
+          >
+            🗑 Delete
+          </button>
 
-      </div>
+        </div>
+      )}
 
     </div>
   );
