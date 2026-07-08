@@ -17,11 +17,9 @@ export default function CreateNotice() {
 
     const res = await fetch("/api/notices", {
       method: "POST",
-
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify({
         title,
         body,
@@ -34,7 +32,6 @@ export default function CreateNotice() {
 
     if (res.ok) {
       alert("Notice Created Successfully!");
-
       router.push("/");
     } else {
       alert("Something went wrong.");
@@ -42,22 +39,8 @@ export default function CreateNotice() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "40px auto",
-        padding: "30px",
-        background: "#fff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-        }}
-      >
+    <div className="mx-auto mt-10 max-w-2xl rounded-xl bg-white p-8 shadow-lg">
+      <h1 className="mb-8 text-center text-3xl font-bold">
         Create Notice
       </h1>
 

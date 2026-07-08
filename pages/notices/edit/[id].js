@@ -19,12 +19,12 @@ export default function EditNotice() {
     fetch(`/api/notices/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        setTitle(data.title);
-        setBody(data.body);
-        setCategory(data.category);
-        setPriority(data.priority);
+        setTitle(data.title || "");
+        setBody(data.body || "");
+        setCategory(data.category || "GENERAL");
+        setPriority(data.priority || "NORMAL");
         setPublishDate(
-            data.publishDate ? data.publishDate.split("T")[0] : ""
+          data.publishDate ? data.publishDate.split("T")[0] : ""
         );
         setImage(data.image || "");
       });
@@ -35,11 +35,9 @@ export default function EditNotice() {
 
     const res = await fetch(`/api/notices/${id}`, {
       method: "PUT",
-
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify({
         title,
         body,
@@ -59,22 +57,8 @@ export default function EditNotice() {
   }
 
   return (
-    <div
-      style={{
-        maxWidth: "700px",
-        margin: "40px auto",
-        padding: "30px",
-        background: "#fff",
-        borderRadius: "10px",
-        boxShadow: "0 4px 12px rgba(0,0,0,.1)",
-      }}
-    >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-        }}
-      >
+    <div className="mx-auto mt-10 max-w-2xl rounded-xl bg-white p-8 shadow-lg">
+      <h1 className="mb-8 text-center text-3xl font-bold">
         Edit Notice
       </h1>
 
