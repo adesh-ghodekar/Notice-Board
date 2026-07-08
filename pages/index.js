@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import NoticeCard from "../components/NoticeCard";
+import StatsCards from "../components/StatsCards";
 
 export default function Home() {
   const [notices, setNotices] = useState([]);
@@ -133,6 +134,7 @@ export default function Home() {
       </p>
 
       <hr className="my-8" />
+      <StatsCards notices={notices} />
 
       <div className="mb-8 grid gap-4 md:grid-cols-4">
 
