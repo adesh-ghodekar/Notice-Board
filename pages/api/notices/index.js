@@ -1,108 +1,56 @@
 import { prisma } from "../../../lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
+import { requireAdmin } from "../../../lib/auth";
+import { validateNoticeInput, toNoticeData } from "../../../utils/validateNotice";
 
 export default async function handler(req, res) {
-
   // ==========================
   // GET ALL NOTICES (PUBLIC)
+  // Urgent-first ordering happens here, in the database query.
   // ==========================
   if (req.method === "GET") {
     try {
-
       const notices = await prisma.notice.findMany({
-        orderBy: [
-          {
-            pinned: "desc",
-          },
-          {
-            priority: "desc",
-          },
-          {
-            publishDate: "desc",
-          },
-        ],
+        orderBy: [{ pinned: "desc" }, { priority: "desc" }, { publishDate: "desc" }],
       });
 
       return res.status(200).json(notices);
-
     } catch (error) {
-
       console.error(error);
-
-      return res.status(500).json({
-        error: "Failed to fetch notices",
-      });
-
+      return res.status(500).json({ error: "Failed to fetch notices" });
     }
   }
 
   // ==========================
-  // AUTH CHECK
+  // AUTH CHECK (everything below requires an admin session)
   // ==========================
-  const session = await getServerSession(req, res, authOptions);
-
-  if (!session) {
-    return res.status(401).json({
-      error: "Unauthorized",
-    });
-  }
+  const session = await requireAdmin(req, res);
+  if (!session) return;
 
   // ==========================
   // CREATE NOTICE
   // ==========================
   if (req.method === "POST") {
-
     try {
+      const errors = validateNoticeInput(req.body);
 
-      const {
-        title,
-        body,
-        category,
-        priority,
-        publishDate,
-        image,
-      } = req.body;
-
-      if (!title?.trim() || !body?.trim()) {
-        return res.status(400).json({
-          error: "Title and Body are required.",
-        });
-      }
-
-      if (!publishDate || isNaN(Date.parse(publishDate))) {
-        return res.status(400).json({
-          error: "Invalid publish date.",
-        });
+      if (errors.length > 0) {
+        return res.status(400).json({ error: errors[0] });
       }
 
       const notice = await prisma.notice.create({
         data: {
-          title,
-          body,
-          category,
-          priority,
-          publishDate: new Date(publishDate),
-          image,
+          ...toNoticeData(req.body),
           pinned: false,
         },
       });
 
       return res.status(201).json(notice);
-
     } catch (error) {
-
       console.error(error);
-
-      return res.status(500).json({
-        error: "Failed to create notice.",
-      });
-
+      return res.status(500).json({ error: "Failed to create notice." });
     }
-
   }
 
-  return res.status(405).json({
-    error: "Method Not Allowed",
-  });
+  res.setHeader("Allow", ["GET", "POST"]);
+  return res.status(405).json({ error: "Method Not Allowed" });
 }

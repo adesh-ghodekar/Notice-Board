@@ -1,40 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# College Notice Board
 
-## Getting Started
+A full-stack Notice Board built with Next.js (Pages Router), Prisma and MySQL.
+Admins can create, edit, delete, and pin notices; the public list is
+responsive, filterable, and always shows Urgent notices first.
 
-First, run the development server:
+## Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- Public notice list with search, category/priority filters, sorting and pagination.
+- Urgent notices always sort above Normal ones — done in the database via Prisma `orderBy`, not in the browser.
+- Admin-only create/edit form (one shared form component for both flows).
+- Delete requires a confirmation dialog.
+- Optional notice image (rendered as a card banner when a valid `http(s)` URL is provided).
+- Admin dashboard for managing notices and other admin accounts.
+- Credentials-based admin login (NextAuth) with hashed passwords (bcrypt).
+- All writes go through `pages/api/` routes with server-side validation — the API rejects bad input even if the browser is bypassed (e.g. via curl/Postman).
+
+## Tech stack
+
+- **Framework:** Next.js 14, Pages Router
+- **Database access:** Prisma ORM
+- **Database:** MySQL (TiDB Cloud free tier)
+- **Auth:** NextAuth (Credentials provider, JWT sessions)
+- **Styling:** Tailwind CSS
+
+## Folder structure
+
+```
+notice-board/
+│
+├── components/
+│   ├── admin/          # AdminTable, DashboardCard - admin-only building blocks
+│   ├── common/          # LoadingSpinner, EmptyState, ConfirmDialog - shared UI
+│   ├── layout/           # Navbar
+│   └── notice/           # NoticeCard, NoticeForm (+ NoticeFormPage), StatsCards, filters, pagination
+│
+├── hooks/
+│   └── useRequireAuth.js # client-side "redirect to /login if no session" guard
+│
+├── lib/
+│   ├── prisma.js         # Prisma client singleton
+│   └── auth.js            # NextAuth config + requireAdmin() API guard
+│
+├── pages/
+│   ├── admin/             # dashboard, manage notices, manage admins
+│   ├── api/                # notices, admins, auth API routes
+│   ├── notices/            # create / edit pages (thin wrappers over NoticeFormPage)
+│   ├── login.js
+│   ├── index.js             # public notice list
+│   ├── _app.js
+│   └── _document.js
+│
+├── prisma/
+│   ├── schema.prisma
+│   ├── migrations/
+│   └── seed.js              # creates a default admin account
+│
+├── public/
+├── styles/
+├── utils/
+│   ├── constants.js         # category/priority/sort option lists (single source of truth)
+│   └── validateNotice.js    # shared server-side validation for create + update
+│
+├── .env.example
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Running locally
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+1. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+2. **Set up environment variables**
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+   Copy `.env.example` to `.env` and fill in real values:
+   ```bash
+   cp .env.example .env
+   ```
+   - `DATABASE_URL` — a free hosted MySQL database (e.g. [TiDB Cloud](https://tidbcloud.com)).
+   - `NEXTAUTH_URL` — `http://localhost:3000` for local dev.
+   - `NEXTAUTH_SECRET` — generate one with `openssl rand -base64 32`.
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. **Run migrations and seed a default admin**
+   ```bash
+   npx prisma migrate deploy
+   npx prisma db seed
+   ```
+   This creates an admin with:
+   - Username: `admin`
+   - Email: `admin@college.com`
+   - Password: `admin123`
 
-## Learn More
+   Change this password (or create a new admin and delete this one) before deploying anywhere public.
 
-To learn more about Next.js, take a look at the following resources:
+4. **Start the dev server**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+## Deploying to Vercel
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Push this repository to a public GitHub repo.
+2. Import it into Vercel (Hobby/free tier).
+3. Add the same three environment variables from `.env` in the Vercel project settings (set `NEXTAUTH_URL` to your Vercel deployment URL).
+4. Deploy. `prisma generate` runs automatically via the `postinstall` script.
+5. Run `npx prisma migrate deploy` once against the production database (locally, pointed at the prod `DATABASE_URL`, or via a one-off Vercel deployment hook) before the first deploy.
 
-## Deploy on Vercel
+## One thing I'd improve with more time
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+<!-- Be honest here — this is a template. Swap in what you'd actually prioritize. -->
+Image uploads currently rely on the admin pasting an external image URL. With
+more time I'd add real file uploads (e.g. to a free tier of Cloudinary or
+Vercel Blob) with server-side size/type checks, instead of trusting a link.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+## Where and how AI was used
+
+<!--
+This section must be an honest, accurate account of your own process —
+edit it to reflect what you actually did. A rough template:
+-->
+AI tools (Claude) were used throughout development: scaffolding the initial
+Next.js/Prisma/NextAuth setup, writing individual components and API routes,
+and later restructuring the project into the folder layout above (extracting
+shared components like `NoticeForm`/`NoticeFormPage`, `AdminTable`,
+`ConfirmDialog`, and centralizing validation in `utils/validateNotice.js` to
+remove duplication between the create and update API routes). All AI-assisted
+code was reviewed, tested locally, and adjusted by hand before committing.

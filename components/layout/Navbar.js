@@ -6,17 +6,15 @@ export default function Navbar() {
 
   return (
     <nav className="bg-blue-800 shadow-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
         <Link
           href="/"
-          className="text-2xl font-bold text-white"
+          className="text-lg font-bold text-white sm:text-2xl"
         >
           📢 College Notice Board
         </Link>
 
-        <div className="flex items-center gap-6">
-
+        <div className="flex flex-wrap items-center gap-3 sm:gap-6">
           <Link
             href="/"
             className="font-medium text-white transition hover:text-blue-200"
@@ -48,9 +46,7 @@ export default function Navbar() {
               Login
             </Link>
           )}
-
         </div>
-
       </div>
     </nav>
   );
