@@ -15,13 +15,24 @@ responsive, filterable, and always shows Urgent notices first.
 - Credentials-based admin login (NextAuth) with hashed passwords (bcrypt).
 - All writes go through `pages/api/` routes with server-side validation — the API rejects bad input even if the browser is bypassed (e.g. via curl/Postman).
 
-## Tech stack
+## 🛠 Tech Stack
 
-- **Framework:** Next.js 14, Pages Router
-- **Database access:** Prisma ORM
-- **Database:** MySQL (TiDB Cloud free tier)
-- **Auth:** NextAuth (Credentials provider, JWT sessions)
-- **Styling:** Tailwind CSS
+Frontend
+- Next.js
+- React
+- Tailwind CSS
+
+Backend
+- Next.js API Routes
+- Prisma ORM
+- TiDB Cloud
+
+Authentication
+- NextAuth
+- bcrypt
+
+Deployment
+- Vercel
 
 ## Folder structure
 
@@ -102,6 +113,17 @@ notice-board/
    ```
    Open [http://localhost:3000](http://localhost:3000).
 
+## Screenshots
+
+Login page
+<img width="1632" height="885" alt="Screenshot 2026-07-09 143157" src="https://github.com/user-attachments/assets/fa3edf01-a254-4d1e-b826-84500db736f3" />
+Home page
+<img width="1727" height="910" alt="Screenshot 2026-07-09 143354" src="https://github.com/user-attachments/assets/45647fc1-e066-48f0-b42a-613cd9e7c0ec" />
+Admin Dashboard
+<img width="1722" height="777" alt="Screenshot 2026-07-09 143524" src="https://github.com/user-attachments/assets/096af1e3-2cf7-4a92-a7f3-772dc6427a12" />
+Manage notice
+<img width="1706" height="902" alt="Screenshot 2026-07-09 143604" src="https://github.com/user-attachments/assets/3b119019-f628-44e0-8b6f-3b022a4167da" />
+
 ## Deploying to Vercel
 
 1. Push this repository to a public GitHub repo.
@@ -112,18 +134,13 @@ notice-board/
 
 ## One thing I'd improve with more time
 
-<!-- Be honest here — this is a template. Swap in what you'd actually prioritize. -->
 Image uploads currently rely on the admin pasting an external image URL. With
 more time I'd add real file uploads (e.g. to a free tier of Cloudinary or
 Vercel Blob) with server-side size/type checks, instead of trusting a link.
 
 ## Where and how AI was used
 
-<!--
-This section must be an honest, accurate account of your own process —
-edit it to reflect what you actually did. A rough template:
--->
-AI tools (Claude) were used throughout development: scaffolding the initial
+AI tools (Claude and ChatGPT) were used throughout development: scaffolding the initial
 Next.js/Prisma/NextAuth setup, writing individual components and API routes,
 and later restructuring the project into the folder layout above (extracting
 shared components like `NoticeForm`/`NoticeFormPage`, `AdminTable`,
